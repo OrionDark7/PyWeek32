@@ -1,2 +1,6 @@
 # PyWeek32
-PyWeek 32 entry
+Run main.py
+
+# Requirements
++ pygame 2.0+
++ PyTMX 3.21+
