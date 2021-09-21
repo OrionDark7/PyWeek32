@@ -8,7 +8,8 @@ objects.window = window
 
 walls = pygame.sprite.Group()
 obstacles = pygame.sprite.Group()
-map.StartWalls(walls)
+indicators = pygame.sprite.Group()
+map.StartWalls(walls, indicators)
 player = objects.Player()
 
 class Messages():
@@ -38,6 +39,7 @@ while running:
 
     if screen == "game":
         window.fill([255, 255, 255])
+        indicators.update(m)
         walls.update(m)
         walls.draw(window)
         obstacles.draw(window)
@@ -47,7 +49,7 @@ while running:
         print(walls)
         for i in m.msgs:
             if i[2] == "newwall" and not hitwall:
-                map.GenerateWalls(walls)
+                map.GenerateWalls(walls, indicators)
                 i[0].remove(walls)
                 hitwall = True
                 print("in")

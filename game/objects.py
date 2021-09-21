@@ -6,24 +6,49 @@ window = pygame.surface.Surface([800, 600])
 class Wall(pygame.sprite.Sprite):
     def __init__(self, pos, type):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.surface.Surface([40, 40])
+        self.image = pygame.surface.Surface([36, 36])
         self.type = str(type)
         self.rect = self.image.get_rect()
         self.rect.topleft = list(pos)
-        self.pos = Vector2(pos[0], pos[1])
+        self.pos = Vector2(pos[0]+2, pos[1]+2)
         self.passed = False
     def message(self, m):
         msg = [self, "wall", str(m)]
         return msg
     def update(self, msgs, action="scroll"):
+        if self.passed:
+            self.kill()
         if action == "scroll":
             self.pos.y += 0.5
             self.rect.topleft = round(self.pos.x), round(self.pos.y)
+            print(self.rect.top)
+            if self.rect.top >= 600 and not self.passed:
+                self.passed = True
+                self.kill()
+
+class Indicator(pygame.sprite.Sprite):
+    def __init__(self, pos):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.surface.Surface([40, 40])
+        self.rect = self.image.get_rect()
+        self.rect.topleft = list(pos)
+        self.pos = Vector2(pos[0]+2, pos[1]+2)
+        self.passed = False
+    def message(self, m):
+        msg = [self, "wall", str(m)]
+        return msg
+    def update(self, msgs, action="scroll"):
+        if self.passed:
+            self.kill()
+            print("test"+str(self.groups()))
+        if action == "scroll":
+            self.pos.y += 0.5
+            self.rect.topleft = round(self.pos.x), round(self.pos.y)
+            print(self.rect.top)
             if self.rect.top >= 600 and not self.passed:
                 self.passed = True
                 msgs.msgs.append(self.message("newwall"))
                 self.kill()
-                print(self.alive())
 
 class Obstacles(pygame.sprite.Sprite):
     def __init__(self, pos, type):
