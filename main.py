@@ -18,17 +18,17 @@ class Messages():
         self.pos = [-1, -1]
 m = Messages()
 
-hitwall = False
-
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 screen = "game"
 running = True
+settings = {"fullscreen":False, "audio":True}
+hitobstacle = False
 
 def StartGame():
-    global hitwall, walls, obstacles, player
+    global walls, obstacles, player, hitobstacle
     map.StartWalls(walls)
-    hitwall = False
     player = objects.Player()
+    hitobstacle = False
 
 while running:
     for event in pygame.event.get():
@@ -42,17 +42,15 @@ while running:
         indicators.update(m)
         walls.update(m)
         walls.draw(window)
+        obstacles.update(m)
         obstacles.draw(window)
         player.update(m)
         player.draw()
-        hitwall = False
-        print(walls)
         for i in m.msgs:
-            if i[2] == "newwall" and not hitwall:
+            if i[2] == "newwall":
                 map.GenerateWalls(walls, indicators)
-                i[0].remove(walls)
-                hitwall = True
-                print("in")
+            elif i[2] == "newchunk":
+                map.GenerateChunk(walls, obstacles, indicators)
             m.msgs.remove(i)
 
     pygame.display.flip()
