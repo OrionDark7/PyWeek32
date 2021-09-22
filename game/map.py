@@ -12,7 +12,6 @@ def GenerateChunk(walls, obstacles, indicators):
     else:
         lastchunk = random.randint(0,0)
     chunk = pytmx.TiledMap("./r/chunks/"+str(lastchunk)+".tmx")
-    print(lastchunk)
     for x in range(7):
         for y in range(8):
             prop = chunk.get_tile_properties(x, y, 0)
