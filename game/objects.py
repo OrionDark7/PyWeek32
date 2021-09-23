@@ -77,10 +77,27 @@ class Obstacles(pygame.sprite.Sprite):
                 msgs.msgs.append(self.message("click"))
 
 class Powerups(pygame.sprite.Sprite):
-    def __init__(self, pos, type):
+    def __init__(self, pos, type, amount):
         pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("./r/images/powerups/"+str(type)+".png")
+        self.rect = self.image.get_rect()
+        self.rect.topleft = list(pos)
+        self.pos = Vector2(self.rect.left, self.rect.top)
+        self.type = str(type)
+        self.amount = float(amount)
+        self.passed = False
     def message(self, m):
         msg = [self, "powerup", str(m)]
+    def update(self, msgs, player, action="scroll"):
+        if self.passed:
+            self.kill()
+        if action == "scroll":
+            self.pos.y += 0.25
+            self.rect.topleft = round(self.pos.x), round(self.pos.y)
+            if self.rect.top >= 600 and not self.passed:
+                self.passed = True
+                self.kill()
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos=400):
