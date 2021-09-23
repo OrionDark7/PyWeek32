@@ -19,7 +19,7 @@ class Wall(pygame.sprite.Sprite):
         if self.passed:
             self.kill()
         if action == "scroll":
-            self.pos.y += 0.25
+            self.pos.y += msgs.speed
             self.rect.topleft = round(self.pos.x), round(self.pos.y)
             if self.rect.top >= 600 and not self.passed:
                 self.passed = True
@@ -41,7 +41,7 @@ class Indicator(pygame.sprite.Sprite):
         if self.passed:
             self.kill()
         if action == "scroll":
-            self.pos.y += 0.25
+            self.pos.y += msgs.speed
             self.rect.topleft = round(self.pos.x), round(self.pos.y)
             if self.rect.top >= 600 and not self.passed:
                 self.passed = True
@@ -59,17 +59,22 @@ class Obstacles(pygame.sprite.Sprite):
         self.rect.topleft = list(pos)
         self.passed = False
         self.pos = Vector2(pos[0], pos[1])
+        self.type = str(type)
     def message(self, m):
         msg = [self, "obstacle", str(m)]
+        return msg
     def update(self, msgs, action="scroll"):
         if self.passed:
             self.kill()
         if action == "scroll":
-            self.pos.y += 0.25
+            self.pos.y += msgs.speed
             self.rect.topleft = round(self.pos.x), round(self.pos.y)
             if self.rect.top >= 600 and not self.passed:
                 self.passed = True
                 self.kill()
+        elif action == "click":
+            if self.rect.collidepoint(msgs.pos):
+                msgs.msgs.append(self.message("click"))
 
 class Powerups(pygame.sprite.Sprite):
     def __init__(self, pos, type):
