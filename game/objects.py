@@ -6,7 +6,7 @@ window = pygame.surface.Surface([800, 600])
 class Wall(pygame.sprite.Sprite):
     def __init__(self, pos, type="wall"):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.surface.Surface([40, 40])
+        self.image = pygame.image.load("./r/images/walls/"+str(type)+".png")
         self.type = str(type)
         self.rect = self.image.get_rect()
         self.rect.topleft = list(pos)
@@ -111,7 +111,8 @@ class Player(pygame.sprite.Sprite):
         window.blit(self.image, self.rect.topleft)
     def message(self, m):
         msg = [self, "player", str(m)]
-    def update(self, msgs, action="move"):
+        return msg
+    def update(self, msgs, walls, obstacles, action="move"):
         if action == "move":
             if msgs.pos[0] >= 280 and msgs.pos[0] <= 520:
                 self.rect.centerx = msgs.pos[0]
@@ -119,3 +120,9 @@ class Player(pygame.sprite.Sprite):
                 self.rect.centerx = 520
             elif msgs.pos[0] < 280:
                 self.rect.centerx = 280
+            if pygame.sprite.spritecollide(self, walls, False):
+                msgs.msgs.append(self.message("dead"))
+            elif pygame.sprite.spritecollide(self, obstacles, False):
+                obstacle = pygame.sprite.spritecollide(self, obstacles, False)[0]
+                msgs.msgs.append(obstacle.message("click"))
+                msgs.speed = 0

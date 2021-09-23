@@ -28,6 +28,8 @@ hitobstacle = False
 obstacledifficulty = {"obstacle":0}
 obstacle = {}
 words = [["gonna", "school", "safe", "today"]]
+pattern = [[]]
+stoptick = 1000*120 #2min
 
 def StartGame():
     global walls, obstacles, player, hitobstacle
@@ -37,10 +39,13 @@ def StartGame():
 
 def CreateObstacle(d, o):
     global words
+    obstacle["tile"] = o
     if d == 0:
         obstacle["type"] = "typing"
         obstacle["puzzle"] = random.choice(words[d])
-        obstacle["tile"] = o
+    if d == 1:
+        obstacle["type"] = "pattern"
+
 
 def DrawGroups():
     global player, walls, obstacles, window
@@ -54,6 +59,7 @@ while running:
             running = False
         elif event.type == pygame.MOUSEMOTION:
             m.pos = pygame.mouse.get_pos()
+            m.down = pygame.mouse.get_pressed()
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if screen == "game":
                 obstacles.update(m, "click")
@@ -66,7 +72,7 @@ while running:
                             break
         elif event.type == pygame.KEYDOWN:
             if screen == "game":
-                if event.key == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
                     screen = "paused"
                 if hitobstacle == True:
                     if obstacle["type"] == "typing":
@@ -77,6 +83,9 @@ while running:
                                 hitobstacle = None
                                 obstacle["tile"].kill()
                                 obstacle = {}
+            elif screen == "paused":
+                if event.key == pygame.K_ESCAPE:
+                    screen = "game"
         elif event.type == pygame.USEREVENT:
             if hitobstacle and m.speed > 0:
                 m.speed -= 0.012
@@ -95,7 +104,8 @@ while running:
         indicators.update(m)
         walls.update(m)
         obstacles.update(m)
-        player.update(m)
+        player.update(m, walls, obstacles)
+        print(m.msgs)
         for i in m.msgs:
             if i[2] == "newwall":
                 map.GenerateWalls(walls, indicators)
@@ -112,6 +122,10 @@ while running:
     elif screen == "paused":
         window.fill([255, 255, 255])
         DrawGroups()
+        ui.color = [0, 0, 0]
+        ui.Box([400, 300], [300, 500], c=True)
+        ui.color = [255, 255, 255]
+        ui.Text("paused", [400, 80], True)
     pygame.display.flip()
 
 pygame.quit()
