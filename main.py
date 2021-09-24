@@ -17,7 +17,7 @@ class Messages():
     def __init__(self):
         self.msgs = []
         self.pos = [-1, -1]
-        self.speed = 0.25
+        self.speed = 0.16
 m = Messages()
 
 pygame.time.set_timer(pygame.USEREVENT, 50)
@@ -30,6 +30,8 @@ obstacle = {}
 words = [["gonna", "school", "safe", "today"]]
 pattern = [[]]
 stoptick = 1000*120 #2min
+GroundSurface = pygame.surface.Surface([280, 600])
+GroundSurface.fill([207, 207, 207])
 
 def StartGame():
     global walls, obstacles, player, hitobstacle
@@ -69,6 +71,7 @@ while running:
                             hitobstacle = True
                             CreateObstacle(obstacledifficulty[i[0].type], i[0])
                             pygame.time.set_timer(pygame.USEREVENT, 50)
+                            m.msgs.remove(i)
                             break
         elif event.type == pygame.KEYDOWN:
             if screen == "game":
@@ -88,26 +91,31 @@ while running:
                     screen = "game"
         elif event.type == pygame.USEREVENT:
             if hitobstacle and m.speed > 0:
-                m.speed -= 0.012
-            elif hitobstacle == None and m.speed < 0.25:
-                m.speed += 0.012
+                m.speed -= 0.02
+            elif hitobstacle == None and m.speed < 0.16:
+                m.speed += 0.02
             if m.speed <= 0:
                 m.speed = 0
-            if m.speed >= 0.25:
+            if m.speed >= 0.16:
                 m.speed = m.speed
                 if hitobstacle == None:
                     hitobstacle = False
 
     if screen == "game":
-        window.fill([255, 255, 255])
+        window.fill([0,0,0])
+        window.blit(GroundSurface, [260, 0])
         DrawGroups()
         indicators.update(m)
         walls.update(m)
         obstacles.update(m)
-        player.update(m, walls, obstacles)
-        print(m.msgs)
+        if not hitobstacle:
+            player.update(m, walls, obstacles)
         for i in m.msgs:
-            if i[2] == "newwall":
+            if i[2] == "click" and not hitobstacle and obstacle == {}:
+                hitobstacle = True
+                CreateObstacle(obstacledifficulty[i[0].type], i[0])
+                pygame.time.set_timer(pygame.USEREVENT, 50)
+            elif i[2] == "newwall":
                 map.GenerateWalls(walls, indicators)
             elif i[2] == "newchunk":
                 map.GenerateChunk(walls, obstacles, indicators)
@@ -120,7 +128,8 @@ while running:
             if obstacle["type"] == "typing":
                 ui.Text(obstacle["puzzle"], [400, 300], True)
     elif screen == "paused":
-        window.fill([255, 255, 255])
+        window.fill([0,0,0])
+        window.blit(GroundSurface, [260, 0])
         DrawGroups()
         ui.color = [0, 0, 0]
         ui.Box([400, 300], [300, 500], c=True)
